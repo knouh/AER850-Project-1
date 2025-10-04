@@ -5,7 +5,6 @@ import seaborn as sns
 from pandas.plotting import scatter_matrix
 
 
-
 import warnings
 from sklearn.exceptions import ConvergenceWarning
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
