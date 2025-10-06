@@ -17,28 +17,28 @@ data = pd.read_csv(file_path)
 X = data[["X","Y","Z"]].to_numpy()
 y = data["Step"].to_numpy()
 
-print("Shape of the dataset:", data.shape)
+print("Shape of the Dataset:", data.shape)
 print("\nColumn names:", data.columns.tolist())
-print("\nFirst 5 rows of the dataset:")
+print("\nFirst 5 rows of the Dataset:")
 print(data.head())
 
 #STEP 2
-#STEP 2.1
-print("\n[2.1] Overall descriptive statistics")
+#STEP 2.1 Overall Descriptive Data
+print("\n[2.1] Overall Descriptive Statistics")
 print(data.describe().T)
 
-#STEP 2.2
-print("\n[2.2] Per-step stats for X, Y, Z")
+#STEP 2.2 Per-Step Statistics for X, Y, Z
+print("\n[2.2] Per-Step Statistics for X, Y, Z")
 per_step = (
     data.groupby("Step")[["X","Y","Z"]]
         .agg(["count","mean","std","min","max"])
         .round(4)
 )
-print("\nX stats by Step:\n", per_step["X"])
-print("\nY stats by Step:\n", per_step["Y"])
-print("\nZ stats by Step:\n", per_step["Z"])
+print("\nX Statistics by Step:\n", per_step["X"])
+print("\nY Statistics by Step:\n", per_step["Y"])
+print("\nZ Statistics by Step:\n", per_step["Z"])
 
-#STEP 2.3
+#STEP 2.3 Class Distribution by Step
 (unique, counts) = np.unique(y, return_counts=True)
 plt.bar(unique, counts, color="purple")
 plt.title("Class Distribution by Step")
@@ -47,62 +47,22 @@ plt.ylabel("Count")
 plt.show()
 
 
-
-#STEP 2.4
-print("\nSTEP 2.4 – Plots: Boxplots of X, Y, Z by Step")
-
-plt.figure()
-data.boxplot(column="X", by="Step")
-plt.title("X by Step")
-plt.suptitle("")
-plt.xlabel("Step")
-plt.ylabel("X")
-plt.tight_layout()
-plt.show()
-
-plt.figure()
-data.boxplot(column="Y", by="Step")
-plt.title("Y by Step")
-plt.suptitle("")
-plt.xlabel("Step")
-plt.ylabel("Y")
-plt.tight_layout()
-plt.show()
-
-plt.figure()
-data.boxplot(column="Z", by="Step")
-plt.title("Z by Step")
-plt.suptitle("")
-plt.xlabel("Step")
-plt.ylabel("Z")
-plt.tight_layout()
-plt.show()
-
+#Step 2.4 Scatter Matrix
 scatter_matrix(data[["X","Y","Z"]], figsize=(7,7))
-plt.suptitle("Scatter matrix")
+plt.suptitle("Scatter Matrix")
 plt.show()
 
-#STEP3
-#STEP 3.1
+
+#STEP 3 Pearson Correlation Matrix/Heatmap
 corr = data[["X","Y","Z","Step"]].corr(method="pearson")
 print(corr)
 
 plt.figure(figsize=(6,5))
 sns.heatmap(corr, annot=True, fmt=".2f", vmin=-1, vmax=1, cmap="coolwarm")
-plt.title("Pearson Correlation Matrix (X, Y, Z, Step)")
+plt.title("Pearson Correlation Matrix")
 plt.tight_layout()
 plt.show()
 
-#STEP 3.2
-ft = corr["Step"].drop("Step").sort_values(ascending=False)
-print("\nCorrelation with Step:\n", ft)
-
-plt.figure(figsize=(5,3))
-sns.barplot(x=ft.index, y=ft.values, color="purple")
-plt.title("Feature–Target Correlation (Pearson)")
-plt.ylabel("corr(feature, Step)")
-plt.tight_layout()
-plt.show()
 
 #STEP 4
 import numpy as np
@@ -124,7 +84,7 @@ Xtr, Xte, ytr, yte = train_test_split(
 )
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-# 4.2 DEFINING MODELS+ GRID
+# 4.2 DEFINING MODELS AND GRID
 # A) SVM 
 svm_pipe = Pipeline([("scaler", StandardScaler()), ("clf", SVC())])
 svm_grid = {
@@ -144,7 +104,7 @@ rf_grid = {
     "class_weight": [None, "balanced"],
 }
 
-# C) LOGISITIC REGRESSION
+# C) LOGISTIC REGRESSION
 log_pipe = Pipeline([("scaler", StandardScaler()),
                      ("clf", LogisticRegression(max_iter=5000, multi_class="ovr", random_state=42))])
 log_grid = {
@@ -188,6 +148,7 @@ print("SVM (Rand) — CV best score:", f"{svm_rand.best_score_:.3f}")
 print("SVM (Rand) — Test accuracy:", f"{accuracy_score(yte, yhat_r):.3f}")
 print("Confusion matrix:\n", confusion_matrix(yte, yhat_r))
     
+
 #STEP 5
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support, classification_report, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
@@ -196,7 +157,7 @@ import numpy as np
 models = {
     "SVM": svm_cv.best_estimator_,
     "RF":  rf_cv.best_estimator_,
-    "LOG": log_cv.best_estimator_,
+    "LR": log_cv.best_estimator_,
 }
 
 def eval_and_plot(name, model, Xte, yte):
@@ -214,7 +175,7 @@ def eval_and_plot(name, model, Xte, yte):
     print(classification_report(yte, yhat, digits=3, zero_division=0))
 
     fig, ax = plt.subplots(figsize=(5,4))
-    ConfusionMatrixDisplay.from_predictions(yte, yhat, cmap="Blues", ax=ax, colorbar=False)
+    ConfusionMatrixDisplay.from_predictions(yte, yhat, cmap="Purples", ax=ax, colorbar=False)
     ax.set_title(f"{name} — Confusion Matrix")
     plt.tight_layout(); plt.show()
 
@@ -249,7 +210,7 @@ print("\nSTACK — Test accuracy:", f"{accuracy_score(yte, yhat_stack):.3f}")
 print(classification_report(yte, yhat_stack, digits=3, zero_division=0))
 
 fig, ax = plt.subplots(figsize=(5,4))
-ConfusionMatrixDisplay.from_predictions(yte, yhat_stack, cmap="Blues", ax=ax, colorbar=False)
+ConfusionMatrixDisplay.from_predictions(yte, yhat_stack, cmap="Purples", ax=ax, colorbar=False)
 ax.set_title("Stacked Model — Confusion Matrix")
 plt.tight_layout(); plt.show()
 
